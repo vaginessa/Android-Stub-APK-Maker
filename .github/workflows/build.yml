@@ -77,15 +77,15 @@ jobs:
             sed -i -e 's/com.android/${{ inputs.package }}/g' app/build.gradle
           fi
           # Set minSdk
-          if [ ${{ inputs.minsdk }} != 24 ]; then
+          if [ "${{ inputs.minsdk }}" != "24" ]; then
             sed -i -e 's/24/${{ inputs.minsdk }}/g' app/build.gradle
           fi
           # Set targetSdk
-          if [ ${{ inputs.targetsdk }} != 34 ]; then
+          if [ "${{ inputs.targetsdk }}" != "34" ]; then
             sed -i -e 's/tSdk\ 34/tSdk\ ${{ inputs.targetsdk }}/g' app/build.gradle
           fi
           # Set versionCode
-          if [ ${{ inputs.versioncode }} > 1 ]; then
+          if [ "${{ inputs.versioncode }}" != "1" ]; then
             sed -i -e 's/\ 1/\ ${{ inputs.versioncode }}/g' app/build.gradle
           fi
           # Set versionName
