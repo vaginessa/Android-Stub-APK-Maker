@@ -13,17 +13,34 @@ on:
           type: string
           description: "Package ID"
           required: true
-          default: ""
+          default: "com.android"
       app_name:
           type: string
           description: "App name"
           required: false
           default: ""
-      stub:
-          type: boolean
-          description: "Stub mode (versionCode: 1)"
+      versioncode:
+          type: string
+          description: "App version code"
           required: true
-          default: true
+          default: 1
+      versionname:
+          type: string
+          description: "App version name"
+          required: false
+          default: ""
+      minsdk:
+          type: choise
+          description: "minSdk"
+          options: ["1", "2", "3" ,"4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34"]
+          required: true
+          default: "24"
+      targetsdk:
+          type: choise
+          description: "targetSdk"
+          options: ["1", "2", "3" ,"4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34"]
+          required: true
+          default: "34"
       sign:
           type: boolean
           description: Custom signing
@@ -56,18 +73,28 @@ jobs:
       - name: Build with Gradle
         run: |
           # Set package ID
-          if [ "${{ inputs.package }}" != "" ]; then
-            sed -i -e "s/com.android.vending/${{ inputs.package }}/g" app/build.gradle
+          if [ "${{ inputs.package }}" != "com.android" ]; then
+            sed -i -e 's/com.android/${{ inputs.package }}/g' app/build.gradle
           fi
-          # Stub or Install block
-          if [ "${{ inputs.stub }}" == "true" ]; then
-            sed -i -e 's/2147483647/1/g' app/build.gradle
+          # Set minSdk
+          if [ ${{ inputs.minsdk }} != 24 ]; then
+            sed -i -e 's/24/${{ inputs.minsdk }}/g' app/build.gradle
           fi
-          echo "version=$(grep versionCode app/build.gradle | awk '{print $2}')" >> $GITHUB_ENV
+          # Set targetSdk
+          if [ ${{ inputs.targetsdk }} != 34 ]; then
+            sed -i -e 's/tSdk\ 34/tSdk\ ${{ inputs.targetsdk }}/g' app/build.gradle
+          fi
+          # Set versionCode
+          if [ ${{ inputs.versioncode }} > 1 ]; then
+            sed -i -e 's/\ 1/\ ${{ inputs.versioncode }}/g' app/build.gradle
+          fi
+          # Set versionName
+          if [ -n "${{ inputs.versionname }}" ]; then
+            sed -i -e 's/\"\"/\"${{ inputs.versionname }}\"/g' app/build.gradle
+          fi
           # Set app name
           if [ "${{ inputs.app_name }}" != "" ]; then
-            sed -i -e 's/\ \/>//g' app/src/main/AndroidManifest.xml
-            sed -i -e "/application/a \        android:label=\"${{ inputs.app_name }}\" \/>" app/src/main/AndroidManifest.xml
+            sed -i -e "s/\"\"/\"${{ inputs.app_name }}\"" app/src/main/AndroidManifest.xml
           fi
           # Set signature
           if [ "${{ inputs.sign }}" == "true" ]; then
@@ -86,5 +113,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.package }}_${{ env.version }}
+          name: ${{ inputs.package }}-${{ inputs.versioncode }}
           path: app/build/outputs/apk/release/app-release.apk
