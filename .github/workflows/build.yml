@@ -1,19 +1,13 @@
 name: Build
 
 on:
-  push:
-    paths:
-      - '.github/workflows/build.yml'
-      - 'app/**'
-      - 'gradle/**'
-      - '*.gradle'
   workflow_dispatch:
     inputs:
       package:
           type: string
           description: "Package ID"
           required: true
-          default: "com.android"
+          default: "com.example.android"
       app_name:
           type: string
           description: "App name"
@@ -73,8 +67,8 @@ jobs:
       - name: Build with Gradle
         run: |
           # Set package ID
-          if [ "${{ inputs.package }}" != "com.android" ]; then
-            sed -i -e 's/com.android/${{ inputs.package }}/g' app/build.gradle
+          if [ "${{ inputs.package }}" != "com.example.android" ]; then
+            sed -i -e 's/com.example.android/${{ inputs.package }}/g' app/build.gradle
           fi
           # Set minSdk
           if [ "${{ inputs.minsdk }}" != "24" ]; then

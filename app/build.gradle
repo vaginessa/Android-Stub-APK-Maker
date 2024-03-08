@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace 'com.android'
+    namespace 'com.example.android'
     compileSdk 34
     buildToolsVersion '34.0.0'
 
